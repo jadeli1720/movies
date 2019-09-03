@@ -8,6 +8,11 @@ const express = require('express');
 
 const server = express();
 
+server.use(express.json())//teaches express to parse JSON body
+
+let actorId = 3;
+let movieId = 5;
+
 let actors = [
     {
         id: 1,
@@ -55,9 +60,45 @@ server.get('/', (req, res) => {
 
 
 server.get('/api/movies', (req, res) => {
+    const minRating = req.query.minrating;
+
+   // if the client provides a minrating, filter the response
+    let result = [...movies];
+
+    if (minRating) {
+        result = movies.filter(m => m.rating >= minRating);
+    }
+
     res.status(200).json(movies);
     
   });
+
+  //adding a movie
+  server.post('/api/movies', (req, res) => {
+    const movie = req.body; //object
+
+    //add the new id"
+    movie.id = movieId++;
+    movies.push(movie);
+
+    //return correct http status code for operation
+    res.status(201).json(movies);
+    
+  });
+
+  //deleting a movie
+  server.delete('/api/movies/:id', (req, res) => {
+      const id = req.params.id;
+      movies = movies.filter(m => m.id !== Number(id));
+
+      res.status(200).json(movies)
+  })
+
+  // get movies of a certain rating
+
+  server.get('/api/movies/', (req, res) => {
+
+  })
 
   server.get('/api/actors', (req, res) => {
     res.status(200).json(actors);
